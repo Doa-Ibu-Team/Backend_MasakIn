@@ -1,4 +1,5 @@
 // const { response } = require('express')
+const { json } = require('express')
 const authModel = require('../models/authModel')
 
 module.exports = {

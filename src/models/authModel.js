@@ -2,6 +2,8 @@ const db = require('../config/mySQL')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
+const optGenerator = require('otp-generator')
+
 
 module.exports = {
     signup: (body) => {
@@ -77,7 +79,8 @@ module.exports = {
                 if (!err) {
                     resolve({
                         status: 200,
-                        message: `Selamat akun anda berhasil di aktivasi`
+                        message: `Selamat akun anda berhasil di aktivasi`,
+                        goTo: 'http://localhost:3000/login'
                     })
                 } else {
                     reject({
@@ -100,7 +103,7 @@ module.exports = {
                             if (!err) {
                                 if (!result) {
                                     reject({
-                                        status: 401,
+                                        status: 403,
                                         message: `Password salah`
                                     })
                                 } else {
@@ -113,7 +116,6 @@ module.exports = {
                                         resolve({
                                             status: 200,
                                             message: `Berhasil login`,
-                                            tokenId: token,
                                             email: email,
                                             id_user:data[0].id_user,
                                             name: data[0].name,
@@ -150,6 +152,7 @@ module.exports = {
             })
         })
     },
+
     forgot_password: (body) => {
         const { email } = body
         return new Promise((resolve, reject) => {
@@ -161,11 +164,44 @@ module.exports = {
                             email: data[0].email
                         }
                         const tokenForgot = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: 1000 * 60 * 15 })
+
+                        // Generate OTP CODE
+                        let otpCode = optGenerator.generate(6,{alphabets:false, upperCase: false, specialChars: false})
+                        //Nodemailer: 
+                        let transporter = nodemailer.createTransport({
+                            service: 'gmail',
+                            host: 'smtp.gmail.com',
+                            port: 578,
+                            secure: false,
+                            auth: {
+                                user: process.env.USER_EMAIL,
+                                pass: process.env.PASS_EMAIL
+                            }
+                        })
+                        //insertOtp(otpCode)
+                        let mailOptions = {
+                            from: "IT Team <teamfoodrecipe@gmail.com>",
+                            to: body.email,
+                            subject: 'Generate OTP Code From FoodRecipe',
+                            html: ` <h3> TESTING OTP CODE </h3>
+                            <p> Hello, this is your OTP Code: ${otpCode} </p>
+                            <a href="${process.env.HOSTNAME}/auth/reset_password/${tokenForgot}"> click ${process.env.HOSTNAME}/auth/reset_password/${tokenForgot} </a> `
+                        }
                         resolve({
                             status: 200,
                             email: email,
-                            message: `${process.env.HOSTNAME}/auth/reset_password/${tokenForgot}`
+                            otp: otpCode,
+                            token: tokenForgot
+                            // message: `${process.env.HOSTNAME}/auth/reset_password/${tokenForgot}`
+                        }, 
+                        transporter.sendMail(mailOptions, (err, data) => {
+                            if(err) {
+                                console.log("Its Error: ", err);
+                            } else {
+                                console.log("Sent Success!!!!");
+                            }
                         })
+                        )
                     } else {
                         reject({
                             status: 404,
