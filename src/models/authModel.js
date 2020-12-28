@@ -47,8 +47,8 @@ module.exports = {
                             to: body.email,
                             subject: 'Activate Account From FoodRecipe Team',
                             html: ` <h1> TESTING API </h1>
-                            <p> Hello, please activate your account with click link below: </p>
-                            <a href="${process.env.HOSTNAME}/auth/activate_account/${token}">Click me ${process.env.HOSTNAME}/auth/activate_account/${token} </a> `
+                            <p> Hello, please click link below to activate your account: </p>
+                            <a href="${process.env.HOSTNAME}/auth/activate_account/${token}"> ${process.env.HOSTNAME}/auth/activate_account/${token} </a> `
                         }
                         resolve(
                             transporter.sendMail(mailOptions, (err, data) => {
@@ -119,7 +119,6 @@ module.exports = {
                                             email: email,
                                             id_user:data[0].id_user,
                                             name: data[0].name,
-                                            tokenId: token
                                         })
                                     }else{
                                         reject({
