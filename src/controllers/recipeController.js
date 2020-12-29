@@ -77,6 +77,10 @@ module.exports = {
   updateRecipe: (req, res) => {
     const { recipeId } = req.params
     let { body } = req
+    body = {
+      ...body,
+      id_user: req.decodedToken.id_user
+    }
     if (req.files.img === undefined) {
       console.log('tidak ada gambar')
     } else {
@@ -92,7 +96,7 @@ module.exports = {
           body
         })
       }).catch((error) => {
-        res.json(error.status).json(error)
+        res.json(500).json(error)
       })
   },
 
