@@ -14,4 +14,6 @@ authRouter.delete('/logout', authController.logout)
 //here
 authRouter.get('/otp/:email/:otp',authController.checkOTP)
 
+//fakhrikontol
+
 module.exports = authRouter
