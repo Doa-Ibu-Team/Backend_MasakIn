@@ -11,4 +11,7 @@ authRouter.post('/forgot_password', authController.forgot_password)
 authRouter.patch('/reset_password/:tokenId', authController.reset_password)
 authRouter.delete('/logout', authController.logout)
 
+//here
+authRouter.get('/otp',authController.checkOTP)
+
 module.exports = authRouter

@@ -88,5 +88,17 @@ module.exports = {
                 })
         }
 
+    },
+
+    checkOTP: (req, res) => {
+        const {email, otp} = req.body
+        authModel.checkOtp(email, otp)
+        .then((result) => {
+            res.status(200).json(result)
+        }).catch((error) => {
+            res.status(200).json({
+                message: `OTP salah`
+            })
+        })
     }
 }
