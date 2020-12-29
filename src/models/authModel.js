@@ -123,7 +123,7 @@ module.exports = {
                         bcrypt.compare(password, data[0].password, (err, result) => {
                             if (!err) {
                                 if (!result) {
-                                    console.log('password benar')
+                                    console.log('password salah')
                                     reject({
                                         status: 403,
                                         message: `Password salah`
@@ -254,6 +254,7 @@ module.exports = {
     },
     reset_password: (body) => {
         const { token, new_password } = body
+        console.log(new_password)
         const decodedToken = jwt.verify(token, process.env.SECRET_KEY)
         const email = decodedToken.email
         return new Promise((resolve, reject) => {
@@ -317,6 +318,7 @@ module.exports = {
     checkOtp: (email, otp) => {
         return new Promise ((resolve, reject) => {
             const queryStr = `SELECT * FROM tb_otp WHERE email = ? AND otp = ?`
+            console.log(queryStr,email,otp)
             db.query(queryStr,[email, otp], (err, data) => {
                 if(!err){
                     if(data.length){

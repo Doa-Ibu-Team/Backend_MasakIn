@@ -293,6 +293,19 @@ module.exports = {
         res.status(500).json(error);
       });
   },
+
+  PopularForYou: (req, res) => {
+    const decodeToken = req.decodedToken;
+    // console.log(req);
+    recipeModel
+      .PopularForYou(decodeToken)
+      .then((result) => {
+        res.status(200).json(result);
+      })
+      .catch((error) => {
+        res.status(500).json(error);
+      });
+  },
   newRecipe: (req, res) => {
     recipeModel.Newest()
       .then((result) => {

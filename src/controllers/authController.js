@@ -42,8 +42,10 @@ module.exports = {
         authModel.login(body)
             .then((result) => {
                 res.status(200).json(result)
+                console.log(result);
             }).catch((error) => {
-                res.status(error.status).json(error)
+                res.status(500).json(error)
+                console.log(error);
             })
 
     },
@@ -66,7 +68,7 @@ module.exports = {
             .then((result) => {
                 res.status(200).json(result)
             }).catch((error) => {
-                res.status(500).json(error)
+                res.json(error)
             })
     },
     logout: (req, res) => {
@@ -92,11 +94,13 @@ module.exports = {
 
     checkOTP: (req, res) => {
         const {email, otp} = req.params
+        console.log(req.params)
+        console.log(req.body)
         authModel.checkOtp(email, otp)
         .then((result) => {
             res.status(200).json(result)
         }).catch((error) => {
-            res.status(200).json({
+            res.status(500).json({
                 message: `OTP salah`
             })
         })

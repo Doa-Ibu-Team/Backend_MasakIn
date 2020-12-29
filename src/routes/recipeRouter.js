@@ -10,6 +10,7 @@ const checkToken = require ('./../helpers/checkToken')
 recipeRouter.get ('/', recipeController.getAllRecipes)
 recipeRouter.get('/video/:videoId',multiUpload, recipeController.getVideoById)
 recipeRouter.get('/views', checkToken.checkLogin, recipeController.Popular); //popular
+recipeRouter.get('/popularforyou', checkToken.checkLogin, recipeController.PopularForYou); //popular
 recipeRouter.get('/new', recipeController.newRecipe)
 recipeRouter.get('/:recipeId', checkToken.isLogin , recipeController.getRecipeById) //perhatikan penempatan
 recipeRouter.post('/add', checkToken.isLogin, multiUpload, recipeController.addRecipe)
