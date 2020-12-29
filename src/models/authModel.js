@@ -117,10 +117,13 @@ module.exports = {
             const queryStr = `SELECT id_user,email,name,is_active, password FROM tb_user WHERE email = ?`
             db.query(queryStr, email, (err, data) => {
                 if (!err) {
+                    console.log('query tidak error')
                     if (data[0]) {
+                        console.log('ada email')
                         bcrypt.compare(password, data[0].password, (err, result) => {
                             if (!err) {
                                 if (!result) {
+                                    console.log('password benar')
                                     reject({
                                         status: 403,
                                         message: `Password salah`
