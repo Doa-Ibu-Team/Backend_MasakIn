@@ -4,6 +4,7 @@
 .eslintrc.json
 .env
 blanja.sql
+foodRecipe.code-workspace
 
 npm-debug.log*
 package-lock.json
