@@ -81,6 +81,7 @@ module.exports = {
     return new Promise ((resolve, reject) => {
       const queryStr = `UPDATE tb_recipe SET ? WHERE id_recipe = ?`
       db.query(queryStr, [updateData, recipeId], (err, data) => {
+        console.log(err)
         if(!err){
           resolve({
             status:200,
