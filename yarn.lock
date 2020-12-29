@@ -1791,6 +1791,11 @@ osenv@^0.1.4:
     os-homedir "^1.0.0"
     os-tmpdir "^1.0.0"
 
+otp-generator@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/otp-generator/-/otp-generator-2.0.0.tgz#51105b291ef966d5b1566b64b693ec96e6930fdf"
+  integrity sha512-VgnQEx+bIgCNodGisqZy+7wZxAnyF1rwwS+DJUBLSNhZ+D789yvknABAAEjwrk05SjMysfY4f4+XJlxSs+p1lg==
+
 p-cancelable@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/p-cancelable/-/p-cancelable-1.1.0.tgz#d078d15a3af409220c886f1d9a0ca2e441ab26cc"

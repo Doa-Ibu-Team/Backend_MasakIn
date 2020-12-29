@@ -25,6 +25,24 @@ module.exports = {
                 const queryStr = `INSERT INTO tb_user SET ?`
                 db.query(queryStr, newUser, (err, data) => {
                     if (!err) {
+                        
+                        //newCodeFromHere
+                        const insertPhoto = {
+                            userId: data.insertId,
+                            img: `/images/default.jpg`
+
+                        }
+                        const qs = `INSERT INTO tb_photo SET ?  `
+                        db.query(qs,insertPhoto, (err, result) => {
+                            if(err){
+                                console.log(err)
+                                reject(err)
+                            }else{
+                                console.log('berhasil')
+                            }
+                        })
+                        //endHere
+
                         //activateAcccount ( via token ) expires In 15 mins
                         const payload = {
                             email: body.email
@@ -116,6 +134,7 @@ module.exports = {
                                         resolve({
                                             status: 200,
                                             message: `Berhasil login`,
+                                            token:token,
                                             email: email,
                                             id_user:data[0].id_user,
                                             name: data[0].name,
