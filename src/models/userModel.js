@@ -1,4 +1,6 @@
 const db = require("../config/mySQL");
+const bcrypt = require('bcrypt');
+const { query } = require("express");
 
 module.exports = {
     getUserRecipes: (id) => {
@@ -19,7 +21,7 @@ module.exports = {
                     });
                 }
             });
-        });  
+        });
     },
     addLike: (user_id, recipe_id) => {
         const body = {
@@ -74,12 +76,12 @@ module.exports = {
         });
     },
     checkLike: (user_id, recipe_id) => {
-        return new Promise ((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             const queryStr = `SELECT * FROM tb_like_recipe WHERE user_id = ? AND recipe_id = ?`
-            db.query(queryStr, [user_id,recipe_id], (err, data) => {
-                if(!err){
+            db.query(queryStr, [user_id, recipe_id], (err, data) => {
+                if (!err) {
                     resolve(data)
-                }else{
+                } else {
                     reject(err)
                 }
             })
@@ -159,12 +161,12 @@ module.exports = {
         });
     },
     checkBookmark: (user_id, recipe_id) => {
-        return new Promise ((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             const queryStr = `SELECT * FROM tb_bookmark_recipe WHERE user_id = ? AND recipe_id = ?`
-            db.query(queryStr, [user_id,recipe_id], (err, data) => {
-                if(!err){
+            db.query(queryStr, [user_id, recipe_id], (err, data) => {
+                if (!err) {
                     resolve(data)
-                }else{
+                } else {
                     reject(err)
                 }
             })
@@ -214,6 +216,101 @@ module.exports = {
                 }
             });
         });
+    },
+
+    //new Endpoint
+
+
+    getOldPhoto: (userId) => {
+        return new Promise((resolve, reject) => {
+            const queryStr = `SELECT img FROM tb_photo WHERE userId = ?`
+            db.query(queryStr, userId, (err, data) => {
+                if (!err) {
+                    resolve(data)
+                } else {
+                    reject(err)
+                }
+            })
+        })
+    },
+    updatePhoto: (userId, photoPath) => {
+        return new Promise((resolve, reject) => {
+            const queryStr = `UPDATE tb_photo SET img = ? WHERE userId = ?`
+            db.query(queryStr, [photoPath, userId], (err, data) => {
+                if (!err) {
+                    resolve({
+                        status: 200,
+                        message: `Berhasil mengubah foto profil`
+                    })
+                } else {
+                    reject({
+                        status: 500,
+                        message: `Encountered error`,
+                        details: err,
+                    });
+                }
+            })
+        })
+    },
+
+    check_password: (email, oldPassword) => {
+        return new Promise((resolve, reject) => {
+            const queryStr = `SELECT password FROM tb_user WHERE email = ?`
+            db.query(queryStr, email, (err, data) => {
+                if (!err) {
+                    bcrypt.compare(oldPassword, data[0].password, (err, result) => {
+                        if (!err) {
+                            if (!result) {
+                                reject({
+                                    status: 403,
+                                    message: `Password tidak sesuai`
+                                })
+                            } else {
+                                resolve({
+                                    message: `TRUE`
+                                })
+                            }
+                        }
+                    })
+                } else {
+                    reject({
+                        status: 500,
+                        message: `SERVER HAS ENCOUNTED AN ERROR`,
+                        details: err
+                    })
+                }
+            })
+        })
+    },
+
+    change_password: (email, newPassword) => {
+        return new Promise((resolve, reject) => {
+            const saltRounds = Math.floor(Math.random() * 10) + 1;
+            bcrypt.hash(newPassword, saltRounds, (error, hashedPassword) => {
+                if (!error) {
+                    const queryStr = `UPDATE tb_user SET password = ? WHERE email = ?`
+                    db.query(queryStr, [hashedPassword, email], (err, data) => {
+                        if (!err) {
+                            resolve({
+                                status: 200,
+                                message: `Sukses mengubah password`
+                            })
+                        } else {
+                            reject({
+                                status: 500,
+                                message: `SERVER HAS ENCOUNTED AN ERROR`,
+                                details: err
+                            })
+                        }
+                    })
+                } else {
+                    reject({
+                        status: 500,
+                        details: error
+                    })
+                }
+            })
+        })
     },
 
 }
