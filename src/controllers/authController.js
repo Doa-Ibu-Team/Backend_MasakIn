@@ -91,7 +91,7 @@ module.exports = {
     },
 
     checkOTP: (req, res) => {
-        const {email, otp} = req.body
+        const {email, otp} = req.params
         authModel.checkOtp(email, otp)
         .then((result) => {
             res.status(200).json(result)
