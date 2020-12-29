@@ -12,6 +12,8 @@ authRouter.patch('/reset_password/:tokenId', authController.reset_password)
 authRouter.delete('/logout', authController.logout)
 
 //here
-authRouter.get('/otp',authController.checkOTP)
+authRouter.get('/otp/:email/:otp',authController.checkOTP)
+
+//fakhrikontol
 
 module.exports = authRouter
