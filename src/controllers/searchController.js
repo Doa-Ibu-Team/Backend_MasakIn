@@ -5,7 +5,7 @@ module.exports = {
     searchRecipe: (req, res) => {
         const { query } = req;
         // const urlQuery = `title=${query.title}`
-        const limit = Number(query.limit) || 10 //jika tidak terdeklarasi limit otomatis 5
+        const limit = Number(query.limit) || 50 //jika tidak terdeklarasi limit otomatis 5
         const page = Number(query.page) || 1 //jika tidak terdeklarasi page otomatis 1
         const offset = (page - 1) * limit
 
