@@ -243,7 +243,7 @@ module.exports = {
 
   getRecipeComment: (recipeId) => {
     return new Promise((resolve, reject) => {
-      const queryStr = `SELECT r.id_recipe, r.title, u.name, c.comment, c.created_at FROM tb_comment_recipe c JOIN tb_user u ON c.user_id = u.id_user JOIN tb_recipe r ON r.id_recipe = c.recipe_id WHERE c.recipe_id = ? ORDER BY c.created_at DESC`;
+      const queryStr = `SELECT r.id_recipe, r.title, u.name, tp.img, c.comment, c.created_at FROM tb_comment_recipe c JOIN tb_user u ON c.user_id = u.id_user JOIN tb_recipe r ON r.id_recipe = c.recipe_id JOIN tb_photo tp ON u.id_user = tp.userId WHERE c.recipe_id = ? ORDER BY c.created_at DESC`;
       db.query(queryStr, recipeId, (err, data) => {
         if (!err) {
           if (data.length) {
