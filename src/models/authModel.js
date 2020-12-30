@@ -2,6 +2,9 @@ const db = require('../config/mySQL')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
+const optGenerator = require('otp-generator')
+const { error } = require('../helpers/form')
+
 
 module.exports = {
     signup: (body) => {
@@ -23,6 +26,24 @@ module.exports = {
                 const queryStr = `INSERT INTO tb_user SET ?`
                 db.query(queryStr, newUser, (err, data) => {
                     if (!err) {
+
+                        //newCodeFromHere
+                        const insertPhoto = {
+                            userId: data.insertId,
+                            img: `/images/default.jpg`
+
+                        }
+                        const qs = `INSERT INTO tb_photo SET ?  `
+                        db.query(qs,insertPhoto, (err, result) => {
+                            if(err){
+                                console.log(err)
+                                reject(err)
+                            }else{
+                                console.log('berhasil')
+                            }
+                        })
+                        //endHere
+
                         //activateAcccount ( via token ) expires In 15 mins
                         const payload = {
                             email: body.email
@@ -77,7 +98,8 @@ module.exports = {
                 if (!err) {
                     resolve({
                         status: 200,
-                        message: `Selamat akun anda berhasil di aktivasi`
+                        message: `Selamat akun anda berhasil di aktivasi`,
+                        goTo: 'http://localhost:3000/login'
                     })
                 } else {
                     reject({
@@ -95,12 +117,15 @@ module.exports = {
             const queryStr = `SELECT id_user,email,name,is_active, password FROM tb_user WHERE email = ?`
             db.query(queryStr, email, (err, data) => {
                 if (!err) {
+                    console.log('query tidak error')
                     if (data[0]) {
+                        console.log('ada email')
                         bcrypt.compare(password, data[0].password, (err, result) => {
                             if (!err) {
                                 if (!result) {
+                                    console.log('password salah')
                                     reject({
-                                        status: 401,
+                                        status: 403,
                                         message: `Password salah`
                                     })
                                 } else {
@@ -113,7 +138,7 @@ module.exports = {
                                         resolve({
                                             status: 200,
                                             message: `Berhasil login`,
-                                            tokenId: token,
+                                            token:token,
                                             email: email,
                                             id_user:data[0].id_user,
                                             name: data[0].name,
@@ -149,6 +174,7 @@ module.exports = {
             })
         })
     },
+
     forgot_password: (body) => {
         const { email } = body
         return new Promise((resolve, reject) => {
@@ -156,16 +182,60 @@ module.exports = {
             db.query(queryStr, email, (err, data) => {
                 if (!err) {
                     if (data[0]) {
-                        const payload = {
-                            email: data[0].email
+
+                        // Generate OTP CODE
+                        let otpCode = optGenerator.generate(6,{alphabets:true, upperCase: false, specialChars: false})
+                        //Nodemailer: 
+                        let transporter = nodemailer.createTransport({
+                            service: 'gmail',
+                            host: 'smtp.gmail.com',
+                            port: 578,
+                            secure: false,
+                            auth: {
+                                user: process.env.USER_EMAIL,
+                                pass: process.env.PASS_EMAIL
+                            }
+                        })
+                        //insertOtp(otpCode)
+                        let mailOptions = {
+                            from: "IT Team <teamfoodrecipe@gmail.com>",
+                            to: body.email,
+                            subject: 'Generate OTP Code From FoodRecipe',
+                            html: ` <h3> OTP CODE </h3>
+                            <p> Hello, this is your OTP Code: ${otpCode} </p>`
                         }
-                        const tokenForgot = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: 1000 * 60 * 15 })
+
+                        //fromHere
+                        const insertOtp = {
+                            email:email,
+                            otp:otpCode
+                        }
+                        const otpQuery = `INSERT INTO tb_otp SET ?`
+                        db.query(otpQuery, insertOtp,(error, res) => {
+                            if(error){
+                                console.log('gagal')
+                            }else{
+                                console.log('berhsil mengirim OTP')
+                            }
+                        })
+                        //toHere
+
                         resolve({
                             status: 200,
                             email: email,
-                            message: `/auth/reset_password/`,
-                            token: tokenForgot
+
+                            //andHere
+                            message:`Silahkan cek email anda.`
+                            // message: `${process.env.HOSTNAME}/auth/reset_password/${tokenForgot}`
+                        }, 
+                        transporter.sendMail(mailOptions, (err, data) => {
+                            if(err) {
+                                console.log("Its Error: ", err);
+                            } else {
+                                console.log("Sent Success!!!!");
+                            }
                         })
+                        )
                     } else {
                         reject({
                             status: 404,
@@ -184,6 +254,7 @@ module.exports = {
     },
     reset_password: (body) => {
         const { token, new_password } = body
+        console.log(new_password)
         const decodedToken = jwt.verify(token, process.env.SECRET_KEY)
         const email = decodedToken.email
         return new Promise((resolve, reject) => {
@@ -193,6 +264,14 @@ module.exports = {
                     const queryStr = `UPDATE tb_user SET password = ? WHERE email = ?`
                     db.query(queryStr, [hasedPassword, email], (err, data) => {
                         if (!err) {
+                            const qs = `DELETE FROM tb_otp WHERE email = ?`
+                            db.query(qs,email,(error, data) => {
+                                if(err){
+                                    reject(error)
+                                }else{
+                                    console.log('sukses menghapus otp')
+                                }
+                            })
                             resolve({
                                 status: 200,
                                 message: `Selamat password anda berhasil diubah`
@@ -234,5 +313,33 @@ module.exports = {
             })
         })
 
+    },
+
+    checkOtp: (email, otp) => {
+        return new Promise ((resolve, reject) => {
+            const queryStr = `SELECT * FROM tb_otp WHERE email = ? AND otp = ?`
+            console.log(queryStr,email,otp)
+            db.query(queryStr,[email, otp], (err, data) => {
+                if(!err){
+                    if(data.length){
+                        const payload = {
+                            email: email
+                        }
+                        const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: 1000 * 60 * 15 })
+                        resolve({
+                            status:200,
+                            message:`OTP Benar`,
+                            token: token
+                        })
+                    }else{
+                        reject({
+                            message:`data not found`
+                        })
+                    }
+                }else{
+                    reject(err)
+                }
+            })
+        })
     }
 }

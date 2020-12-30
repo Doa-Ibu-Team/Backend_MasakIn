@@ -81,6 +81,7 @@ module.exports = {
     return new Promise ((resolve, reject) => {
       const queryStr = `UPDATE tb_recipe SET ? WHERE id_recipe = ?`
       db.query(queryStr, [updateData, recipeId], (err, data) => {
+        console.log(err)
         if(!err){
           resolve({
             status:200,
@@ -306,6 +307,45 @@ module.exports = {
       });
     });
   },
+
+  PopularForYou: (decodeToken) => {
+    const checkUser = decodeToken;
+    return new Promise((resolve, reject) => {
+      let queryStr = "";
+      if (checkUser != undefined) {
+        // console.log("Ada user");
+        queryStr += `
+        SELECT tr.id_recipe, tr.title, tr.img, IFNULL(rl.like, 0) as count_like FROM tb_recipe tr LEFT JOIN (SELECT recipe_id, count(recipe_id) as 'like' FROM tb_like_recipe GROUP BY recipe_id) rl ON tr.id_recipe = rl.recipe_id  
+            ORDER BY count_like  DESC LIMIT 1 OFFSET 0
+        `;
+      } else {
+        // console.log("Tidak ada user");
+        queryStr += `SELECT id_recipe, img, title, views FROM tb_recipe ORDER BY views DESC LIMIT 1 OFFSET 0`;
+      }
+
+      // console.log(decodeToken);
+      db.query(queryStr, (err, data) => {
+        if (!err) {
+          // console.log(data)
+          // console.log('resolve')
+          resolve({
+            status: 200,
+            message: `berhasil menampilkan data`,
+            data: data,
+          });
+          // resolve(data)
+        } else {
+          console.log("reject");
+          reject({
+            status: 500,
+            message: `Encountered error`,
+            details: err,
+          });
+        }
+      });
+    });
+  },
+
   Newest: () => {
     return new Promise ((resolve, reject) => {
         const qs = `SELECT id_recipe, title, img, last_modified FROM tb_recipe ORDER BY last_modified DESC LIMIT 1 OFFSET 0`

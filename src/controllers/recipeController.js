@@ -77,6 +77,10 @@ module.exports = {
   updateRecipe: (req, res) => {
     const { recipeId } = req.params
     let { body } = req
+    body = {
+      ...body,
+      id_user: req.decodedToken.id_user
+    }
     if (req.files.img === undefined) {
       console.log('tidak ada gambar')
     } else {
@@ -92,7 +96,7 @@ module.exports = {
           body
         })
       }).catch((error) => {
-        res.json(error.status).json(error)
+        res.json(500).json(error)
       })
   },
 
@@ -282,6 +286,19 @@ module.exports = {
     // console.log(req);
     recipeModel
       .Popular(decodeToken)
+      .then((result) => {
+        res.status(200).json(result);
+      })
+      .catch((error) => {
+        res.status(500).json(error);
+      });
+  },
+
+  PopularForYou: (req, res) => {
+    const decodeToken = req.decodedToken;
+    // console.log(req);
+    recipeModel
+      .PopularForYou(decodeToken)
       .then((result) => {
         res.status(200).json(result);
       })
