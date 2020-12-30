@@ -2,14 +2,14 @@ require('dotenv').config()
 const express = require('express');
 const logger = require('morgan');
 const app = express();
-const port = 8000
+const PORT = process.env.PORT || 8900;
 const db = require('./src/config/mySQL')
 const mainRouter = require('./src/routes/index')
 const cors = require('cors')
 
 // listen port
-app.listen(port, () => {
-    console.log(`server running in port ${port}`);
+app.listen(PORT, () => {
+    console.log(`server running in port ${PORT}`);
 })
 
 //memperbolehkan akses dari semua origin
