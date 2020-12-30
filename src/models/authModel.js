@@ -99,7 +99,7 @@ module.exports = {
                     resolve({
                         status: 200,
                         message: `Selamat akun anda berhasil di aktivasi`,
-                        goTo: 'http://localhost:3000/login'
+                        goTo: `${process.env.HOSTNAME_FRONT}/login`
                     })
                 } else {
                     reject({
