@@ -77,7 +77,7 @@ yarn add express mysql morgan bcrypt jsonwebtoken fs nodemailer otp-generator
 
 ## Related Project
 
-This restAPI provided to [`MasakIn-FrontEnd`](https://github.com/Doa-Ibu-Team/Frontend_Masakin/)
+This restAPI provided for [`MasakIn-FrontEnd`](https://github.com/Doa-Ibu-Team/Frontend_Masakin/)
 
 For more information about documentation, check it out below ! 
 
