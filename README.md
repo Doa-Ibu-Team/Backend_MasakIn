@@ -3,6 +3,10 @@
 
 this project is a simple implementation of RESTful API using *framework* ExpressJS and MySQL *database* made for for <a href="http://bit.ly/MasakIn">MasakIn</a> website
 
+- [Requirements](#requirements)
+- [Getting started](#getting-started)
+- [Related Project](#related-project)
+
 ## Requirements
 
 - npm [Node.js](https://nodejs.org/en/download/)
@@ -70,6 +74,10 @@ yarn add express mysql morgan bcrypt jsonwebtoken fs nodemailer otp-generator
 5. Dont forget to turn on server for MySQL database
 6. Type `yarn start` or `npm start` to run this project
 7. Happy coding!
+
+## Related Project
+
+This restAPI provided to [`MasakIn-FrontEnd`](https://github.com/Doa-Ibu-Team/Frontend_Masakin/)
 
 For more information about documentation, check it out below ! 
 
